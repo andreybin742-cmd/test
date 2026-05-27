@@ -224,14 +224,27 @@
             gap: 5px;
             align-items: center;
             margin: 10px 0;
+            flex-wrap: wrap;
         }
         .star {
             font-size: 24px;
             cursor: pointer;
             color: #555;
+            transition: all 0.1s;
         }
         .star.active {
             color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+        .average-rating {
+            font-size: 13px;
+            color: #ffd700;
+            margin-left: 10px;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: rgba(255,215,0,0.1);
         }
         .delete-btn {
             background: none;
@@ -263,6 +276,65 @@
         }
         .notification-bar.show {
             transform: translateY(0);
+        }
+
+        /* Модальное окно для списка оценок */
+        .ratings-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+        .ratings-popup-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 320px;
+            width: 90%;
+            border: 1px solid #ffd700;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .ratings-popup h3 {
+            color: #ffd700;
+            margin-top: 0;
+            text-align: center;
+        }
+        .ratings-list {
+            margin: 16px 0;
+        }
+        .rating-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .rating-user {
+            font-weight: bold;
+            color: #fff;
+        }
+        .rating-stars-small {
+            color: #ffd700;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+        .close-popup-btn {
+            background: #ffd700;
+            color: #1a1a2e;
+            border: none;
+            padding: 12px;
+            border-radius: 30px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 16px;
         }
     </style>
 </head>
@@ -333,6 +405,15 @@
             <button onclick="addItem('theater')">✨ Предложить</button>
         </div>
         <div id="theatersList"></div>
+    </div>
+</div>
+
+<!-- Модальное окно для списка оценок -->
+<div id="ratingsPopup" class="ratings-popup" onclick="closeRatingsPopup(event)">
+    <div class="ratings-popup-content" onclick="event.stopPropagation()">
+        <h3>⭐ Кто и как оценил</h3>
+        <div id="ratingsList" class="ratings-list"></div>
+        <button class="close-popup-btn" onclick="closeRatingsPopup()">Закрыть</button>
     </div>
 </div>
 
@@ -432,13 +513,14 @@
     }
 
     async function rateItem(type, id, rating) {
+        if (!currentUserName) return;
         const docRef = db.collection(`${type}Recommendations`).doc(id);
         const doc = await docRef.get();
         if (doc.exists) {
             const ratings = doc.data().ratings || {};
             if (ratings[currentUserName] === rating) {
                 delete ratings[currentUserName];
-                showNotification(`${currentUserName} снял(а) оценку`);
+                showNotification(`${currentUserName} снял(а) оценку ⭐`);
             } else {
                 ratings[currentUserName] = rating;
                 showNotification(`${currentUserName} оценил(а) на ${rating} ⭐`);
@@ -452,20 +534,63 @@
             alert('Удалить можно только своё предложение');
             return;
         }
-        if (confirm('Удалить?')) {
+        if (confirm('Удалить это предложение?')) {
             await db.collection(`${type}Recommendations`).doc(id).delete();
-            showNotification('Удалено');
+            showNotification('Предложение удалено');
         }
+    }
+
+    function showRatingsPopup(ratings) {
+        const popup = document.getElementById('ratingsPopup');
+        const container = document.getElementById('ratingsList');
+        
+        if (!ratings || Object.keys(ratings).length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#888; padding:20px;">😢 Пока нет оценок</div>';
+        } else {
+            // Сортируем по имени
+            const sorted = Object.entries(ratings).sort((a, b) => a[0].localeCompare(b[0]));
+            container.innerHTML = sorted.map(([name, rating]) => `
+                <div class="rating-item">
+                    <span class="rating-user">${escapeHtml(name)}</span>
+                    <span class="rating-stars-small">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span>
+                </div>
+            `).join('');
+        }
+        popup.style.display = 'flex';
+    }
+
+    function closeRatingsPopup(e) {
+        if (!e || e.target === document.getElementById('ratingsPopup') || e.target.classList.contains('close-popup-btn')) {
+            document.getElementById('ratingsPopup').style.display = 'none';
+        }
+    }
+
+    function calculateAverage(ratings) {
+        if (!ratings) return 0;
+        const values = Object.values(ratings);
+        if (values.length === 0) return 0;
+        const sum = values.reduce((a, b) => a + b, 0);
+        return (sum / values.length).toFixed(1);
     }
 
     function renderStars(itemId, ratings, type) {
         const userRating = ratings?.[currentUserName] || 0;
+        const avgRating = calculateAverage(ratings);
+        const ratingCount = ratings ? Object.keys(ratings).length : 0;
+        
         let starsHtml = '<div class="rating-stars">';
         for (let i = 1; i <= 5; i++) {
             starsHtml += `<span class="star ${userRating >= i ? 'active' : ''}" onclick="rateItem('${type}', '${itemId}', ${i})">★</span>`;
         }
+        starsHtml += `<span class="average-rating" onclick="showRatingsPopup(${JSON.stringify(ratings || {}).replace(/"/g, '&quot;')})">⭐ ${avgRating} (${ratingCount} ${getRatingWord(ratingCount)})</span>`;
         starsHtml += '</div>';
         return starsHtml;
+    }
+
+    function getRatingWord(count) {
+        if (count % 10 === 1 && count % 100 !== 11) return 'оценка';
+        if (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) return 'оценки';
+        return 'оценок';
     }
 
     function renderList(containerId, items, type) {
@@ -497,6 +622,9 @@
             movies = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             renderList('moviesList', movies, 'movie');
             document.getElementById('syncStatus').textContent = '✅ Синхронизировано';
+        }, error => {
+            console.error(error);
+            document.getElementById('syncStatus').textContent = '⚠️ Ошибка подключения';
         });
         
         // Сериалы
@@ -534,6 +662,8 @@
     window.deleteItem = deleteItem;
     window.saveUserName = saveUserName;
     window.showNameModal = showNameModal;
+    window.showRatingsPopup = showRatingsPopup;
+    window.closeRatingsPopup = closeRatingsPopup;
 </script>
 </body>
 </html>
