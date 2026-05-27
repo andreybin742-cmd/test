@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>КиноКлуб | Рекомендации отдела</title>
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
@@ -14,105 +18,252 @@
             color: #fff;
             min-height: 100vh;
         }
-        body::before {
-            content: "";
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Модальное окно имени */
+        .name-modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 8px);
-            pointer-events: none;
-            z-index: 0;
-        }
-        .container { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
-        .name-modal {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center;
-            z-index: 2000; backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
         }
         .name-modal-content {
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            padding: 32px 24px; border-radius: 32px; text-align: center; width: 300px;
-            border: 1px solid rgba(255,215,0,0.3); box-shadow: 0 0 40px rgba(255,215,0,0.1);
+            padding: 32px 24px;
+            border-radius: 32px;
+            text-align: center;
+            width: 300px;
+            border: 1px solid rgba(255,215,0,0.3);
         }
-        .name-modal-content h3 { color: #ffd700; margin-bottom: 20px; }
+        .name-modal-content h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
         .name-modal-content input {
-            width: 100%; padding: 14px; font-size: 16px; text-align: center;
-            border: 2px solid #ffd700; border-radius: 16px; background: rgba(0,0,0,0.5);
-            color: white; margin: 16px 0;
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            text-align: center;
+            border: 2px solid #ffd700;
+            border-radius: 16px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            margin: 16px 0;
         }
         .name-modal-content button {
-            background: linear-gradient(135deg, #ffd700, #ff8c00); color: #1a1a2e;
-            border: none; padding: 12px 24px; border-radius: 30px; font-size: 16px;
-            font-weight: bold; width: 100%; cursor: pointer;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
         }
-        .main-content { display: none; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { font-size: 32px; margin: 0; background: linear-gradient(135deg, #ffd700, #ff8c00); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .header p { color: #aaa; font-size: 12px; margin-top: 5px; }
-        .sync-status { font-size: 11px; color: #00b894; margin-top: 8px; }
+
+        .main-content {
+            display: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin: 0;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sync-status {
+            font-size: 11px;
+            color: #00b894;
+            margin-top: 8px;
+        }
         .user-info {
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            margin-top: 10px; font-size: 14px; background: rgba(255,255,255,0.1);
-            padding: 8px 16px; border-radius: 40px; width: fit-content; margin-left: auto; margin-right: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 40px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .change-name-btn { background: none; border: none; color: #ffd700; font-size: 12px; text-decoration: underline; cursor: pointer; }
+        .change-name-btn {
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 12px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
         .nav-buttons {
-            display: flex; gap: 12px; margin-bottom: 24px; background: rgba(0,0,0,0.5);
-            padding: 8px; border-radius: 60px; backdrop-filter: blur(10px);
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px;
+            border-radius: 60px;
         }
         .nav-btn {
-            flex: 1; padding: 12px; border: none; border-radius: 50px; font-size: 14px;
-            font-weight: bold; background: transparent; color: #aaa; cursor: pointer; transition: all 0.3s;
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: bold;
+            background: transparent;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .nav-btn.active { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #1a1a2e; box-shadow: 0 0 20px rgba(255,215,0,0.5); }
-        .page { display: none; }
-        .page.active { display: block; }
-        .search-panel {
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-radius: 24px;
-            padding: 16px; margin-bottom: 20px; border: 1px solid rgba(255,215,0,0.2);
+        .nav-btn.active {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
         }
-        .search-input { width: 100%; padding: 12px; border: 1px solid rgba(255,215,0,0.3); border-radius: 30px; background: rgba(0,0,0,0.5); color: white; font-size: 14px; margin-bottom: 12px; }
-        .filters-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-        .filter-select { flex: 1; padding: 10px; border: 1px solid rgba(255,215,0,0.3); border-radius: 30px; background: rgba(0,0,0,0.5); color: white; font-size: 13px; cursor: pointer; }
-        .sort-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-        .sort-btn { padding: 8px 16px; border: 1px solid rgba(255,215,0,0.3); border-radius: 30px; background: rgba(0,0,0,0.5); color: #aaa; font-size: 12px; cursor: pointer; }
-        .sort-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-color: #ffd700; }
-        .my-only-btn { padding: 8px 16px; border: 1px solid rgba(255,215,0,0.3); border-radius: 30px; background: rgba(0,0,0,0.5); color: #aaa; font-size: 12px; cursor: pointer; }
-        .my-only-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-color: #ffd700; }
-        .card { background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,215,0,0.2); }
-        .card-title { font-size: 20px; font-weight: bold; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; color: #ffd700; }
-        .add-form { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; margin-bottom: 20px; }
-        .add-form input, .add-form select, .add-form textarea { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; background: rgba(0,0,0,0.5); color: white; font-size: 14px; }
-        .add-form button { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #1a1a2e; border: none; padding: 12px; border-radius: 30px; font-size: 16px; font-weight: bold; width: 100%; cursor: pointer; }
-        .recommendation-item { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; margin-bottom: 16px; }
-        .recommendation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
-        .recommendation-title { font-size: 18px; font-weight: bold; color: #ffd700; }
-        .recommendation-genre { background: rgba(255,215,0,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; }
-        .recommendation-author { font-size: 12px; color: #aaa; margin-bottom: 8px; }
-        .recommendation-comment { font-size: 14px; color: #ddd; margin-bottom: 12px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 12px; }
-        .rating-stars { display: flex; gap: 5px; align-items: center; margin: 10px 0; flex-wrap: wrap; }
-        .star { font-size: 24px; cursor: pointer; color: #555; transition: all 0.1s; }
-        .star.active { color: #ffd700; text-shadow: 0 0 10px #ffd700; }
-        .average-rating { font-size: 13px; color: #ffd700; margin-left: 10px; cursor: pointer; text-decoration: underline; }
-        .ratings-popup { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; }
-        .ratings-popup-content { background: #1a1a2e; border-radius: 24px; padding: 20px; max-width: 300px; width: 90%; border: 1px solid #ffd700; }
-        .ratings-list { max-height: 300px; overflow-y: auto; margin: 16px 0; }
-        .rating-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .comment-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .comment-input { display: flex; gap: 8px; margin-top: 8px; }
-        .comment-input input { flex: 1; padding: 8px; border: 1px solid rgba(255,215,0,0.3); border-radius: 20px; background: rgba(0,0,0,0.5); color: white; font-size: 12px; }
-        .comment-input button { background: #ffd700; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
-        .comment-list { margin-top: 8px; max-height: 150px; overflow-y: auto; }
-        .comment-item { font-size: 12px; color: #ccc; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .comment-author { color: #ffd700; font-weight: bold; }
-        .delete-btn { background: none; border: none; color: #ff7675; cursor: pointer; font-size: 14px; }
-        .empty-message { text-align: center; color: #aaa; padding: 40px; }
-        .notification-bar { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #ffd700; color: #1a1a2e; text-align: center; padding: 12px; border-radius: 50px; transform: translateY(100px); transition: transform 0.3s ease; z-index: 1500; font-weight: bold; }
-        .notification-bar.show { transform: translateY(0); }
-        .stats-info { font-size: 12px; color: #888; text-align: center; margin-top: 10px; }
-        footer { text-align: center; font-size: 11px; color: #555; margin-top: 30px; padding: 16px; }
+
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(0,0,0,0.6);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #ffd700;
+        }
+
+        .add-form input, .add-form select, .add-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            font-size: 14px;
+        }
+        .add-form button {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .movie-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .movie-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+        .movie-genre {
+            background: rgba(255,215,0,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        .movie-author {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+        .movie-comment {
+            font-size: 14px;
+            color: #ddd;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+        }
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .star {
+            font-size: 24px;
+            cursor: pointer;
+            color: #555;
+        }
+        .star.active {
+            color: #ffd700;
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ff7675;
+            cursor: pointer;
+            font-size: 14px;
+            float: right;
+        }
+        .empty-message {
+            text-align: center;
+            color: #aaa;
+            padding: 40px;
+        }
+        .notification-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #ffd700;
+            color: #1a1a2e;
+            text-align: center;
+            padding: 12px;
+            border-radius: 50px;
+            transform: translateY(100px);
+            transition: transform 0.3s ease;
+            z-index: 1500;
+            font-weight: bold;
+        }
+        .notification-bar.show {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -129,110 +280,59 @@
 <div id="mainContent" class="container">
     <div class="header">
         <h1>🎬 КиноКлуб</h1>
-        <p>Рекомендуем лучшее коллегам</p>
         <div class="sync-status" id="syncStatus">🔄 Синхронизация...</div>
         <div class="user-info" id="userInfo"></div>
     </div>
 
     <div class="nav-buttons">
-        <button class="nav-btn" data-page="movies">🎬 Фильмы</button>
+        <button class="nav-btn active" data-page="movies">🎬 Фильмы</button>
         <button class="nav-btn" data-page="series">📺 Сериалы</button>
         <button class="nav-btn" data-page="theaters">🎭 Театры</button>
     </div>
 
-    <!-- СТРАНИЦА ФИЛЬМОВ -->
-    <div id="moviesPage" class="page">
+    <!-- Фильмы -->
+    <div id="moviesPage" class="page active">
         <div class="card add-form">
-            <div class="card-title">🎬 Предложить фильм</div>
+            <div class="card-title">➕ Предложить фильм</div>
             <input type="text" id="movieTitle" placeholder="Название фильма">
             <select id="movieGenre">
-                <option value="Боевик">💥 Боевик</option><option value="Комедия">😂 Комедия</option><option value="Драма">🎭 Драма</option>
-                <option value="Триллер">😱 Триллер</option><option value="Фантастика">🚀 Фантастика</option><option value="Ужасы">🧛 Ужасы</option>
-                <option value="Мелодрама">💔 Мелодрама</option><option value="Детектив">🔍 Детектив</option><option value="Аниме">🇯🇵 Аниме</option>
-                <option value="Документальный">📹 Документальный</option>
+                <option>Боевик</option><option>Комедия</option><option>Драма</option><option>Триллер</option>
+                <option>Фантастика</option><option>Ужасы</option><option>Мелодрама</option><option>Детектив</option>
             </select>
             <textarea id="movieComment" placeholder="Почему стоит посмотреть?"></textarea>
-            <button onclick="addRecommendation('movie')">✨ Предложить фильм</button>
-        </div>
-        <div class="search-panel">
-            <input type="text" id="movieSearch" class="search-input" placeholder="🔍 Поиск по названию...">
-            <div class="filters-row">
-                <select id="movieGenreFilter" class="filter-select"><option value="all">Все жанры</option></select>
-                <select id="movieRatingFilter" class="filter-select"><option value="all">Любой рейтинг</option><option value="4">⭐ от 4 звёзд</option><option value="3">⭐ от 3 звёзд</option></select>
-            </div>
-            <div class="sort-buttons">
-                <button class="sort-btn active" data-sort="date" data-type="movie">📅 По дате</button>
-                <button class="sort-btn" data-sort="rating" data-type="movie">⭐ По рейтингу</button>
-                <button class="my-only-btn" data-myonly="movie" id="myOnlyMovieBtn">👤 Только мои</button>
-            </div>
-            <div class="stats-info" id="movieStats"></div>
+            <button onclick="addItem('movie')">✨ Предложить</button>
         </div>
         <div id="moviesList"></div>
     </div>
 
+    <!-- Сериалы -->
     <div id="seriesPage" class="page">
         <div class="card add-form">
-            <div class="card-title">📺 Предложить сериал</div>
+            <div class="card-title">➕ Предложить сериал</div>
             <input type="text" id="seriesTitle" placeholder="Название сериала">
             <select id="seriesGenre">
-                <option value="Боевик">💥 Боевик</option><option value="Комедия">😂 Комедия</option><option value="Драма">🎭 Драма</option>
-                <option value="Триллер">😱 Триллер</option><option value="Фантастика">🚀 Фантастика</option><option value="Ужасы">🧛 Ужасы</option>
-                <option value="Ситком">😂 Ситком</option>
+                <option>Боевик</option><option>Комедия</option><option>Драма</option><option>Триллер</option>
+                <option>Фантастика</option><option>Ужасы</option><option>Ситком</option>
             </select>
             <textarea id="seriesComment" placeholder="Почему стоит посмотреть?"></textarea>
-            <button onclick="addRecommendation('series')">✨ Предложить сериал</button>
-        </div>
-        <div class="search-panel">
-            <input type="text" id="seriesSearch" class="search-input" placeholder="🔍 Поиск по названию...">
-            <div class="filters-row">
-                <select id="seriesGenreFilter" class="filter-select"><option value="all">Все жанры</option></select>
-                <select id="seriesRatingFilter" class="filter-select"><option value="all">Любой рейтинг</option><option value="4">⭐ от 4 звёзд</option><option value="3">⭐ от 3 звёзд</option></select>
-            </div>
-            <div class="sort-buttons">
-                <button class="sort-btn active" data-sort="date" data-type="series">📅 По дате</button>
-                <button class="sort-btn" data-sort="rating" data-type="series">⭐ По рейтингу</button>
-                <button class="my-only-btn" data-myonly="series" id="myOnlySeriesBtn">👤 Только мои</button>
-            </div>
-            <div class="stats-info" id="seriesStats"></div>
+            <button onclick="addItem('series')">✨ Предложить</button>
         </div>
         <div id="seriesList"></div>
     </div>
 
+    <!-- Театры -->
     <div id="theatersPage" class="page">
         <div class="card add-form">
-            <div class="card-title">🎭 Предложить спектакль</div>
-            <input type="text" id="theaterTitle" placeholder="Название спектакля / Театр">
+            <div class="card-title">➕ Предложить спектакль</div>
+            <input type="text" id="theaterTitle" placeholder="Название спектакля">
             <select id="theaterGenre">
-                <option value="Драма">🎭 Драма</option><option value="Комедия">😂 Комедия</option><option value="Мюзикл">🎵 Мюзикл</option>
-                <option value="Балет">🩰 Балет</option><option value="Опера">🎤 Опера</option><option value="Современный">✨ Современный</option><option value="Детский">🧸 Детский</option>
+                <option>Драма</option><option>Комедия</option><option>Мюзикл</option><option>Балет</option>
+                <option>Опера</option><option>Современный</option><option>Детский</option>
             </select>
             <textarea id="theaterComment" placeholder="Почему стоит посмотреть?"></textarea>
-            <button onclick="addRecommendation('theater')">✨ Предложить спектакль</button>
-        </div>
-        <div class="search-panel">
-            <input type="text" id="theaterSearch" class="search-input" placeholder="🔍 Поиск по названию...">
-            <div class="filters-row">
-                <select id="theaterGenreFilter" class="filter-select"><option value="all">Все жанры</option></select>
-                <select id="theaterRatingFilter" class="filter-select"><option value="all">Любой рейтинг</option><option value="4">⭐ от 4 звёзд</option><option value="3">⭐ от 3 звёзд</option></select>
-            </div>
-            <div class="sort-buttons">
-                <button class="sort-btn active" data-sort="date" data-type="theater">📅 По дате</button>
-                <button class="sort-btn" data-sort="rating" data-type="theater">⭐ По рейтингу</button>
-                <button class="my-only-btn" data-myonly="theater" id="myOnlyTheaterBtn">👤 Только мои</button>
-            </div>
-            <div class="stats-info" id="theaterStats"></div>
+            <button onclick="addItem('theater')">✨ Предложить</button>
         </div>
         <div id="theatersList"></div>
-    </div>
-
-    <footer>🎬 Обсуждаем, рекомендуем, вдохновляемся вместе</footer>
-</div>
-
-<div id="ratingsPopup" class="ratings-popup" onclick="closeRatingsPopup(event)">
-    <div class="ratings-popup-content" onclick="event.stopPropagation()">
-        <h3>⭐ Оценки пользователей</h3>
-        <div id="ratingsList" class="ratings-list"></div>
-        <button onclick="closeRatingsPopup()" style="width:100%; padding:10px; background:#ffd700; border:none; border-radius:30px; cursor:pointer;">Закрыть</button>
     </div>
 </div>
 
@@ -244,28 +344,29 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
 <script>
-    // ========== ВАШИ ДАННЫЕ ИЗ FIREBASE (скопированы с вашего скриншота) ==========
+    // ========== ВАШИ ДАННЫЕ ИЗ FIREBASE ==========
     const firebaseConfig = {
         apiKey: "AIzaSyCHOezN64WZ5Xa9HxyMT6Xwf-Gx_6CcCX0",
         authDomain: "my-new-projekt1.firebaseapp.com",
         projectId: "my-new-projekt1",
         storageBucket: "my-new-projekt1.firebasestorage.app",
         messagingSenderId: "797468384758",
-        appId: "1:797468384758:web:13026a27b851e140793bd7",
-        measurementId: "G-1GCPHDB39C"
+        appId: "1:797468384758:web:13026a27b851e140793bd7"
     };
-    // ==============================================
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     let currentUserName = localStorage.getItem('kinoClubUserName');
-    let moviesData = [], seriesData = [], theatersData = [];
-    let movieFilters = { search: '', genre: 'all', rating: 'all' };
-    let seriesFilters = { search: '', genre: 'all', rating: 'all' };
-    let theaterFilters = { search: '', genre: 'all', rating: 'all' };
-    let movieSort = 'date', seriesSort = 'date', theaterSort = 'date';
-    let movieMyOnly = false, seriesMyOnly = false, theaterMyOnly = false;
+    let movies = [], series = [], theaters = [];
+
+    // Инициализация
+    if (currentUserName) {
+        document.getElementById('nameModal').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('userInfo').innerHTML = `👤 ${currentUserName} <button class="change-name-btn" onclick="showNameModal()">(сменить)</button>`;
+        loadAll();
+    }
 
     function saveUserName() {
         const name = document.getElementById('userNameInput').value.trim();
@@ -275,22 +376,13 @@
             document.getElementById('nameModal').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('userInfo').innerHTML = `👤 ${currentUserName} <button class="change-name-btn" onclick="showNameModal()">(сменить)</button>`;
-            initApp();
-        } else {
-            alert('Введите ваше имя');
+            loadAll();
         }
     }
 
     function showNameModal() {
         document.getElementById('nameModal').style.display = 'flex';
         document.getElementById('userNameInput').value = currentUserName || '';
-    }
-
-    if (currentUserName) {
-        document.getElementById('nameModal').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
-        document.getElementById('userInfo').innerHTML = `👤 ${currentUserName} <button class="change-name-btn" onclick="showNameModal()">(сменить)</button>`;
-        initApp();
     }
 
     function showNotification(msg) {
@@ -300,14 +392,9 @@
         setTimeout(() => bar.classList.remove('show'), 2500);
     }
 
-    function updateSyncStatus(online) {
-        const el = document.getElementById('syncStatus');
-        el.textContent = online ? '✅ Синхронизировано' : '⚠️ Офлайн режим';
-        el.style.color = online ? '#00b894' : '#ff7675';
-    }
-
-    async function addRecommendation(type) {
+    async function addItem(type) {
         if (!currentUserName) return;
+        
         let title, genre, comment;
         if (type === 'movie') {
             title = document.getElementById('movieTitle').value.trim();
@@ -331,220 +418,122 @@
             document.getElementById('theaterTitle').value = '';
             document.getElementById('theaterComment').value = '';
         }
+        
         try {
             await db.collection(`${type}Recommendations`).add({
                 title, genre, comment, author: currentUserName,
-                timestamp: Date.now(), ratings: {}, averageRating: 0, ratingCount: 0, comments: []
+                timestamp: Date.now(), ratings: {}
             });
-            showNotification(`${currentUserName} предложил(а): ${title}`);
-        } catch (error) { console.error(error); updateSyncStatus(false); }
+            showNotification(`${currentUserName} добавил(а): ${title}`);
+        } catch (error) {
+            console.error(error);
+            showNotification('Ошибка!');
+        }
     }
 
     async function rateItem(type, id, rating) {
-        if (!currentUserName) return;
         const docRef = db.collection(`${type}Recommendations`).doc(id);
         const doc = await docRef.get();
         if (doc.exists) {
-            const data = doc.data();
-            const ratings = data.ratings || {};
+            const ratings = doc.data().ratings || {};
             if (ratings[currentUserName] === rating) {
                 delete ratings[currentUserName];
-                showNotification(`${currentUserName} снял(а) оценку ⭐`);
+                showNotification(`${currentUserName} снял(а) оценку`);
             } else {
                 ratings[currentUserName] = rating;
                 showNotification(`${currentUserName} оценил(а) на ${rating} ⭐`);
             }
-            const values = Object.values(ratings);
-            const average = values.length ? values.reduce((a,b)=>a+b,0)/values.length : 0;
-            await docRef.update({ ratings, averageRating: Math.round(average * 10) / 10, ratingCount: values.length });
+            await docRef.update({ ratings });
         }
     }
 
-    function showRatingsPopup(ratings) {
-        const popup = document.getElementById('ratingsPopup');
-        const container = document.getElementById('ratingsList');
-        if (!ratings || Object.keys(ratings).length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:#888;">Нет оценок</div>';
-        } else {
-            container.innerHTML = Object.entries(ratings).map(([name, rating]) => 
-                `<div class="rating-item"><span>${escapeHtml(name)}</span><span style="color:#ffd700;">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span></div>`
-            ).join('');
+    async function deleteItem(type, id, author) {
+        if (author !== currentUserName) {
+            alert('Удалить можно только своё предложение');
+            return;
         }
-        popup.style.display = 'flex';
-    }
-
-    function closeRatingsPopup(e) {
-        if (!e || e.target === document.getElementById('ratingsPopup')) {
-            document.getElementById('ratingsPopup').style.display = 'none';
-        }
-    }
-
-    async function addComment(type, id) {
-        if (!currentUserName) return;
-        const input = document.getElementById(`commentInput_${type}_${id}`);
-        const text = input.value.trim();
-        if (!text) return;
-        const docRef = db.collection(`${type}Recommendations`).doc(id);
-        const doc = await docRef.get();
-        if (doc.exists) {
-            const comments = doc.data().comments || [];
-            comments.push({ author: currentUserName, text, timestamp: Date.now() });
-            await docRef.update({ comments });
-            input.value = '';
-            showNotification(`${currentUserName} добавил комментарий`);
-        }
-    }
-
-    async function deleteRecommendation(type, id, author) {
-        if (author !== currentUserName) { alert('Удалить можно только своё предложение'); return; }
-        if (confirm('Удалить это предложение?')) {
+        if (confirm('Удалить?')) {
             await db.collection(`${type}Recommendations`).doc(id).delete();
-            showNotification('Предложение удалено');
+            showNotification('Удалено');
         }
     }
 
-    function renderStars(itemId, userRating, averageRating, ratingCount, ratings, type) {
-        return `
-            <div class="rating-stars">
-                ${[1,2,3,4,5].map(i => `<span class="star ${userRating >= i ? 'active' : ''}" onclick="rateItem('${type}', '${itemId}', ${i})">★</span>`).join('')}
-                <span class="average-rating" onclick="showRatingsPopup(${JSON.stringify(ratings).replace(/"/g, '&quot;')})">⭐ ${averageRating || 0} (${ratingCount || 0} оценок)</span>
-            </div>
-        `;
+    function renderStars(itemId, ratings, type) {
+        const userRating = ratings?.[currentUserName] || 0;
+        let starsHtml = '<div class="rating-stars">';
+        for (let i = 1; i <= 5; i++) {
+            starsHtml += `<span class="star ${userRating >= i ? 'active' : ''}" onclick="rateItem('${type}', '${itemId}', ${i})">★</span>`;
+        }
+        starsHtml += '</div>';
+        return starsHtml;
     }
 
-    function renderComments(comments) {
-        if (!comments?.length) return '<div style="color:#777; font-size:12px;">Нет комментариев</div>';
-        return comments.map(c => `
-            <div class="comment-item">
-                <span class="comment-author">${escapeHtml(c.author)}</span> <span style="color:#888;">${new Date(c.timestamp).toLocaleTimeString()}</span><br>
-                ${escapeHtml(c.text)}
-            </div>
-        `).join('');
-    }
-
-    function renderList(type, items, filters, sortType, myOnly) {
-        let filtered = [...items];
-        if (filters.search) filtered = filtered.filter(i => i.title?.toLowerCase().includes(filters.search.toLowerCase()));
-        if (filters.genre !== 'all') filtered = filtered.filter(i => i.genre === filters.genre);
-        if (filters.rating !== 'all') filtered = filtered.filter(i => (i.averageRating || 0) >= parseInt(filters.rating));
-        if (myOnly) filtered = filtered.filter(i => i.author === currentUserName);
-        filtered.sort((a,b) => sortType === 'date' ? (b.timestamp||0) - (a.timestamp||0) : (b.averageRating||0) - (a.averageRating||0));
+    function renderList(containerId, items, type) {
+        const container = document.getElementById(containerId);
+        if (!items || items.length === 0) {
+            container.innerHTML = '<div class="empty-message">🎬 Пока ничего нет. Будьте первым!</div>';
+            return;
+        }
         
-        const container = document.getElementById(`${type}List`);
-        if (!filtered.length) { container.innerHTML = '<div class="empty-message">🎬 Ничего не найдено</div>'; return; }
-        
-        container.innerHTML = filtered.map(item => {
-            const userRating = item.ratings?.[currentUserName] || 0;
-            return `
-                <div class="recommendation-item">
-                    <div class="recommendation-header">
-                        <span class="recommendation-title">${escapeHtml(item.title)}</span>
-                        <span class="recommendation-genre">${escapeHtml(item.genre)}</span>
-                        ${item.author === currentUserName ? `<button class="delete-btn" onclick="deleteRecommendation('${type}', '${item.id}', '${item.author}')">🗑️</button>` : ''}
-                    </div>
-                    <div class="recommendation-author">👤 ${escapeHtml(item.author)} • ${item.timestamp ? new Date(item.timestamp).toLocaleDateString() : 'дата неизвестна'}</div>
-                    ${item.comment ? `<div class="recommendation-comment">💬 ${escapeHtml(item.comment)}</div>` : ''}
-                    ${renderStars(item.id, userRating, item.averageRating, item.ratingCount, item.ratings || {}, type)}
-                    <div class="comment-section">
-                        <div class="comment-list">${renderComments(item.comments)}</div>
-                        <div class="comment-input">
-                            <input type="text" id="commentInput_${type}_${item.id}" placeholder="Комментарий...">
-                            <button onclick="addComment('${type}', '${item.id}')">💬</button>
-                        </div>
-                    </div>
+        let html = '';
+        items.forEach(item => {
+            html += `
+                <div class="movie-item">
+                    ${item.author === currentUserName ? `<button class="delete-btn" onclick="deleteItem('${type}', '${item.id}', '${item.author}')">🗑️</button>` : ''}
+                    <div class="movie-title">${escapeHtml(item.title)}</div>
+                    <div class="movie-genre">${escapeHtml(item.genre)}</div>
+                    <div class="movie-author">👤 ${escapeHtml(item.author)} • ${new Date(item.timestamp).toLocaleDateString()}</div>
+                    ${item.comment ? `<div class="movie-comment">💬 ${escapeHtml(item.comment)}</div>` : ''}
+                    ${renderStars(item.id, item.ratings, type)}
                 </div>
             `;
-        }).join('');
-        document.getElementById(`${type}Stats`).innerHTML = `📊 Показано: ${filtered.length} из ${items.length}`;
-    }
-
-    function updateLists() {
-        renderList('movie', moviesData, movieFilters, movieSort, movieMyOnly);
-        renderList('series', seriesData, seriesFilters, seriesSort, seriesMyOnly);
-        renderList('theater', theatersData, theaterFilters, theaterSort, theaterMyOnly);
-    }
-
-    function loadRecommendations(type) {
-        db.collection(`${type}Recommendations`).orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-            const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            if (type === 'movie') { moviesData = items; updateLists(); }
-            else if (type === 'series') { seriesData = items; updateLists(); }
-            else { theatersData = items; updateLists(); }
-            updateSyncStatus(true);
-        }, () => updateSyncStatus(false));
-    }
-
-    function initNavigation() {
-        const pages = { movies: 'moviesPage', series: 'seriesPage', theaters: 'theatersPage' };
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                Object.values(pages).forEach(p => document.getElementById(p).classList.remove('active'));
-                document.getElementById(pages[btn.dataset.page]).classList.add('active');
-            });
         });
-        document.querySelector('.nav-btn').classList.add('active');
-        document.getElementById('moviesPage').classList.add('active');
+        container.innerHTML = html;
     }
 
-    function initFilters() {
-        // Заполняем жанры для фильмов
-        const movieGenres = ['Боевик','Комедия','Драма','Триллер','Фантастика','Ужасы','Мелодрама','Детектив','Аниме','Документальный'];
-        const movieFilter = document.getElementById('movieGenreFilter');
-        movieGenres.forEach(g => { movieFilter.add(new Option(g, g)); });
+    function loadAll() {
+        // Фильмы
+        db.collection('movieRecommendations').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+            movies = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderList('moviesList', movies, 'movie');
+            document.getElementById('syncStatus').textContent = '✅ Синхронизировано';
+        });
         
-        const seriesGenres = ['Боевик','Комедия','Драма','Триллер','Фантастика','Ужасы','Ситком'];
-        const seriesFilter = document.getElementById('seriesGenreFilter');
-        seriesGenres.forEach(g => { seriesFilter.add(new Option(g, g)); });
+        // Сериалы
+        db.collection('seriesRecommendations').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+            series = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderList('seriesList', series, 'series');
+        });
         
-        const theaterGenres = ['Драма','Комедия','Мюзикл','Балет','Опера','Современный','Детский'];
-        const theaterFilter = document.getElementById('theaterGenreFilter');
-        theaterGenres.forEach(g => { theaterFilter.add(new Option(g, g)); });
-        
-        document.getElementById('movieSearch')?.addEventListener('input', e => { movieFilters.search = e.target.value; updateLists(); });
-        document.getElementById('movieGenreFilter')?.addEventListener('change', e => { movieFilters.genre = e.target.value; updateLists(); });
-        document.getElementById('movieRatingFilter')?.addEventListener('change', e => { movieFilters.rating = e.target.value; updateLists(); });
-        document.querySelectorAll('[data-sort][data-type="movie"]').forEach(btn => btn.onclick = () => { movieSort = btn.dataset.sort; updateLists(); });
-        document.getElementById('myOnlyMovieBtn')?.addEventListener('click', () => { movieMyOnly = !movieMyOnly; updateLists(); });
-        
-        document.getElementById('seriesSearch')?.addEventListener('input', e => { seriesFilters.search = e.target.value; updateLists(); });
-        document.getElementById('seriesGenreFilter')?.addEventListener('change', e => { seriesFilters.genre = e.target.value; updateLists(); });
-        document.getElementById('seriesRatingFilter')?.addEventListener('change', e => { seriesFilters.rating = e.target.value; updateLists(); });
-        document.querySelectorAll('[data-sort][data-type="series"]').forEach(btn => btn.onclick = () => { seriesSort = btn.dataset.sort; updateLists(); });
-        document.getElementById('myOnlySeriesBtn')?.addEventListener('click', () => { seriesMyOnly = !seriesMyOnly; updateLists(); });
-        
-        document.getElementById('theaterSearch')?.addEventListener('input', e => { theaterFilters.search = e.target.value; updateLists(); });
-        document.getElementById('theaterGenreFilter')?.addEventListener('change', e => { theaterFilters.genre = e.target.value; updateLists(); });
-        document.getElementById('theaterRatingFilter')?.addEventListener('change', e => { theaterFilters.rating = e.target.value; updateLists(); });
-        document.querySelectorAll('[data-sort][data-type="theater"]').forEach(btn => btn.onclick = () => { theaterSort = btn.dataset.sort; updateLists(); });
-        document.getElementById('myOnlyTheaterBtn')?.addEventListener('click', () => { theaterMyOnly = !theaterMyOnly; updateLists(); });
+        // Театры
+        db.collection('theaterRecommendations').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+            theaters = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderList('theatersList', theaters, 'theater');
+        });
     }
 
-    function escapeHtml(text) { 
-        if (!text) return ''; 
-        return text.replace(/[&<>]/g, function(m) { 
-            return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]; 
-        }); 
+    // Навигация
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${btn.dataset.page}Page`).classList.add('active');
+        });
+    });
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/[&<>]/g, function(m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m];
+        });
     }
 
-    function initApp() {
-        initNavigation();
-        initFilters();
-        loadRecommendations('movie');
-        loadRecommendations('series');
-        loadRecommendations('theater');
-        setInterval(() => updateSyncStatus(navigator.onLine), 5000);
-    }
-
+    window.addItem = addItem;
+    window.rateItem = rateItem;
+    window.deleteItem = deleteItem;
     window.saveUserName = saveUserName;
     window.showNameModal = showNameModal;
-    window.addRecommendation = addRecommendation;
-    window.rateItem = rateItem;
-    window.showRatingsPopup = showRatingsPopup;
-    window.closeRatingsPopup = closeRatingsPopup;
-    window.addComment = addComment;
-    window.deleteRecommendation = deleteRecommendation;
 </script>
 </body>
 </html>
