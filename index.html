@@ -44,7 +44,6 @@
             z-index: 1;
         }
 
-        /* Модальное окно имени */
         .name-modal {
             position: fixed;
             top: 0;
@@ -520,6 +519,16 @@
             <div class="filters-row">
                 <select id="movieGenreFilter" class="filter-select">
                     <option value="all">Все жанры</option>
+                    <option value="Боевик">💥 Боевик</option>
+                    <option value="Комедия">😂 Комедия</option>
+                    <option value="Драма">🎭 Драма</option>
+                    <option value="Триллер">😱 Триллер</option>
+                    <option value="Фантастика">🚀 Фантастика</option>
+                    <option value="Ужасы">🧛 Ужасы</option>
+                    <option value="Мелодрама">💔 Мелодрама</option>
+                    <option value="Детектив">🔍 Детектив</option>
+                    <option value="Аниме">🇯🇵 Аниме</option>
+                    <option value="Документальный">📹 Документальный</option>
                 </select>
                 <select id="movieRatingFilter" class="filter-select">
                     <option value="all">Любой рейтинг</option>
@@ -562,6 +571,16 @@
             <div class="filters-row">
                 <select id="seriesGenreFilter" class="filter-select">
                     <option value="all">Все жанры</option>
+                    <option value="Боевик">💥 Боевик</option>
+                    <option value="Комедия">😂 Комедия</option>
+                    <option value="Драма">🎭 Драма</option>
+                    <option value="Триллер">😱 Триллер</option>
+                    <option value="Фантастика">🚀 Фантастика</option>
+                    <option value="Ужасы">🧛 Ужасы</option>
+                    <option value="Мелодрама">💔 Мелодрама</option>
+                    <option value="Детектив">🔍 Детектив</option>
+                    <option value="Аниме">🇯🇵 Аниме</option>
+                    <option value="Ситком">😂 Ситком</option>
                 </select>
                 <select id="seriesRatingFilter" class="filter-select">
                     <option value="all">Любой рейтинг</option>
@@ -601,6 +620,13 @@
             <div class="filters-row">
                 <select id="theaterGenreFilter" class="filter-select">
                     <option value="all">Все жанры</option>
+                    <option value="Драма">🎭 Драма</option>
+                    <option value="Комедия">😂 Комедия</option>
+                    <option value="Мюзикл">🎵 Мюзикл</option>
+                    <option value="Балет">🩰 Балет</option>
+                    <option value="Опера">🎤 Опера</option>
+                    <option value="Современный">✨ Современный</option>
+                    <option value="Детский">🧸 Детский</option>
                 </select>
                 <select id="theaterRatingFilter" class="filter-select">
                     <option value="all">Любой рейтинг</option>
@@ -621,7 +647,6 @@
     <footer>🎬 Обсуждаем, рекомендуем, вдохновляемся вместе</footer>
 </div>
 
-<!-- Модальное окно для списка оценок -->
 <div id="ratingsPopup" class="ratings-popup" onclick="closeRatingsPopup(event)">
     <div class="ratings-popup-content" onclick="event.stopPropagation()">
         <h3>⭐ Оценки пользователей</h3>
@@ -702,7 +727,7 @@
 
     async function addRecommendation(type) {
         if (!currentUserName) return;
-        let title, genre, comment, titleId, genreId, commentId;
+        let title, genre, comment;
         if (type === 'movie') {
             title = document.getElementById('movieTitle').value.trim();
             genre = document.getElementById('movieGenre').value;
@@ -726,7 +751,8 @@
             document.getElementById('theaterComment').value = '';
         }
         try {
-            await db.collection(`${type}Recommendations`).add({
+            const collectionName = `${type}Recommendations`;
+            await db.collection(collectionName).add({
                 title, genre, comment, author: currentUserName,
                 timestamp: Date.now(), ratings: {}, averageRating: 0, ratingCount: 0, comments: []
             });
@@ -736,7 +762,8 @@
 
     async function rateItem(type, id, rating) {
         if (!currentUserName) return;
-        const docRef = db.collection(`${type}Recommendations`).doc(id);
+        const collectionName = `${type}Recommendations`;
+        const docRef = db.collection(collectionName).doc(id);
         const doc = await docRef.get();
         if (doc.exists) {
             const data = doc.data();
@@ -782,7 +809,8 @@
         const input = document.getElementById(`commentInput_${type}_${id}`);
         const text = input.value.trim();
         if (!text) return;
-        const docRef = db.collection(`${type}Recommendations`).doc(id);
+        const collectionName = `${type}Recommendations`;
+        const docRef = db.collection(collectionName).doc(id);
         const doc = await docRef.get();
         if (doc.exists) {
             const comments = doc.data().comments || [];
@@ -796,7 +824,8 @@
     async function deleteRecommendation(type, id, author) {
         if (author !== currentUserName) { alert('Удалить можно только своё предложение'); return; }
         if (confirm('Удалить это предложение?')) {
-            await db.collection(`${type}Recommendations`).doc(id).delete();
+            const collectionName = `${type}Recommendations`;
+            await db.collection(collectionName).doc(id).delete();
             showNotification('Предложение удалено');
         }
     }
@@ -810,7 +839,7 @@
         `;
     }
 
-    function renderComments(comments, type, id) {
+    function renderComments(comments) {
         if (!comments?.length) return '<div style="color:#777; font-size:12px;">Нет комментариев</div>';
         return comments.map(c => `
             <div class="comment-item">
@@ -844,7 +873,7 @@
                     ${item.comment ? `<div class="recommendation-comment">💬 ${escapeHtml(item.comment)}</div>` : ''}
                     ${renderStars(item.id, userRating, item.averageRating, item.ratingCount, item.ratings || {}, type)}
                     <div class="comment-section">
-                        <div class="comment-list">${renderComments(item.comments, type, item.id)}</div>
+                        <div class="comment-list">${renderComments(item.comments)}</div>
                         <div class="comment-input">
                             <input type="text" id="commentInput_${type}_${item.id}" placeholder="Комментарий...">
                             <button onclick="addComment('${type}', '${item.id}')">💬</button>
@@ -863,7 +892,8 @@
     }
 
     function loadRecommendations(type) {
-        db.collection(`${type}Recommendations`).orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+        const collectionName = `${type}Recommendations`;
+        db.collection(collectionName).orderBy('timestamp', 'desc').onSnapshot(snapshot => {
             const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             if (type === 'movie') { moviesData = items; updateLists(); }
             else if (type === 'series') { seriesData = items; updateLists(); }
@@ -887,23 +917,21 @@
     }
 
     function initFilters() {
-        const genreOptions = ['Боевик','Комедия','Драма','Триллер','Фантастика','Ужасы','Мелодрама','Детектив','Аниме','Документальный','Ситком','Мюзикл','Балет','Опера','Современный','Детский'];
-        ['movie', 'series', 'theater'].forEach(t => {
-            const filter = document.getElementById(`${t}GenreFilter`);
-            if (filter) genreOptions.forEach(g => { if (![...filter.options].some(o=>o.value===g)) filter.add(new Option(g,g)); });
-        });
+        // Фильмы
         document.getElementById('movieSearch')?.addEventListener('input', e => { movieFilters.search = e.target.value; updateLists(); });
         document.getElementById('movieGenreFilter')?.addEventListener('change', e => { movieFilters.genre = e.target.value; updateLists(); });
         document.getElementById('movieRatingFilter')?.addEventListener('change', e => { movieFilters.rating = e.target.value; updateLists(); });
         document.querySelectorAll('[data-sort][data-type="movie"]').forEach(btn => btn.onclick = () => { movieSort = btn.dataset.sort; updateLists(); });
         document.getElementById('myOnlyMovieBtn')?.addEventListener('click', () => { movieMyOnly = !movieMyOnly; updateLists(); });
         
+        // Сериалы
         document.getElementById('seriesSearch')?.addEventListener('input', e => { seriesFilters.search = e.target.value; updateLists(); });
         document.getElementById('seriesGenreFilter')?.addEventListener('change', e => { seriesFilters.genre = e.target.value; updateLists(); });
         document.getElementById('seriesRatingFilter')?.addEventListener('change', e => { seriesFilters.rating = e.target.value; updateLists(); });
         document.querySelectorAll('[data-sort][data-type="series"]').forEach(btn => btn.onclick = () => { seriesSort = btn.dataset.sort; updateLists(); });
         document.getElementById('myOnlySeriesBtn')?.addEventListener('click', () => { seriesMyOnly = !seriesMyOnly; updateLists(); });
         
+        // Театры
         document.getElementById('theaterSearch')?.addEventListener('input', e => { theaterFilters.search = e.target.value; updateLists(); });
         document.getElementById('theaterGenreFilter')?.addEventListener('change', e => { theaterFilters.genre = e.target.value; updateLists(); });
         document.getElementById('theaterRatingFilter')?.addEventListener('change', e => { theaterFilters.rating = e.target.value; updateLists(); });
@@ -911,7 +939,12 @@
         document.getElementById('myOnlyTheaterBtn')?.addEventListener('click', () => { theaterMyOnly = !theaterMyOnly; updateLists(); });
     }
 
-    function escapeHtml(text) { if (!text) return ''; return text.replace(/[&<>]/g, function(m) { return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]; }); }
+    function escapeHtml(text) { 
+        if (!text) return ''; 
+        return text.replace(/[&<>]/g, function(m) { 
+            return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]; 
+        }); 
+    }
 
     function initApp() {
         initNavigation();
