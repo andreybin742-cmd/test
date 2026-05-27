@@ -350,26 +350,46 @@
         }
         .comment-list {
             margin-bottom: 8px;
-            max-height: 150px;
+            max-height: 200px;
             overflow-y: auto;
         }
         .comment-item {
             font-size: 12px;
             color: #ccc;
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .comment-content {
+            flex: 1;
         }
         .comment-author {
             color: #ffd700;
             font-weight: bold;
         }
-        .comment-text {
-            margin-top: 2px;
-        }
         .comment-time {
             font-size: 10px;
             color: #666;
             margin-left: 8px;
+        }
+        .comment-text {
+            margin-top: 3px;
+            word-break: break-word;
+        }
+        .comment-delete {
+            background: none;
+            border: none;
+            color: #ff7675;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 4px;
+            opacity: 0.6;
+        }
+        .comment-delete:hover {
+            opacity: 1;
         }
         .comment-input {
             display: flex;
@@ -597,6 +617,7 @@
         if (doc.exists) {
             const comments = doc.data().comments || [];
             comments.push({
+                id: Date.now(),
                 author: currentUserName,
                 text: text,
                 timestamp: Date.now()
@@ -604,6 +625,22 @@
             await docRef.update({ comments });
             input.value = '';
             showNotification(`${currentUserName} добавил комментарий 💬`);
+        }
+    }
+
+    async function deleteComment(type, itemId, commentId) {
+        const docRef = db.collection(`${type}Recommendations`).doc(itemId);
+        const doc = await docRef.get();
+        if (doc.exists) {
+            const comments = doc.data().comments || [];
+            const comment = comments.find(c => c.id === commentId);
+            if (comment && comment.author === currentUserName) {
+                const updatedComments = comments.filter(c => c.id !== commentId);
+                await docRef.update({ comments: updatedComments });
+                showNotification('Комментарий удалён 🗑️');
+            } else {
+                alert('Удалить можно только свой комментарий');
+            }
         }
     }
 
@@ -670,16 +707,24 @@
         return 'оценок';
     }
 
-    function renderComments(comments, type, id) {
+    function formatDate(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    }
+
+    function renderComments(comments, type, itemId) {
         if (!comments || comments.length === 0) {
             return '<div style="color:#777; font-size:12px; padding:4px 0;">💬 Нет комментариев. Будьте первым!</div>';
         }
         
         return comments.map(c => `
             <div class="comment-item">
-                <span class="comment-author">${escapeHtml(c.author)}</span>
-                <span class="comment-time">${new Date(c.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-                <div class="comment-text">${escapeHtml(c.text)}</div>
+                <div class="comment-content">
+                    <span class="comment-author">${escapeHtml(c.author)}</span>
+                    <span class="comment-time">${formatDate(c.timestamp)}</span>
+                    <div class="comment-text">${escapeHtml(c.text)}</div>
+                </div>
+                ${c.author === currentUserName ? `<button class="comment-delete" onclick="deleteComment('${type}', '${itemId}', ${c.id})" title="Удалить комментарий">🗑️</button>` : ''}
             </div>
         `).join('');
     }
@@ -761,6 +806,7 @@
     window.addItem = addItem;
     window.rateItem = rateItem;
     window.addComment = addComment;
+    window.deleteComment = deleteComment;
     window.deleteItem = deleteItem;
     window.saveUserName = saveUserName;
     window.showNameModal = showNameModal;
